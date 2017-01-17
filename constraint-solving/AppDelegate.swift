@@ -12,6 +12,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var window: NSWindow!
+    @IBOutlet weak var blueprint: BlueprintView!
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
