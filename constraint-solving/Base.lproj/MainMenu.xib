@@ -15,7 +15,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="constraint_solving" customModuleProvider="target">
             <connections>
-                <outlet property="blueprint" destination="79U-pS-Gbg" id="eVV-v2-out"/>
+                <outlet property="blueprintView" destination="79U-pS-Gbg" id="sYM-7y-2SI"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="XUA-ZM-F9e"/>
             </connections>
         </customObject>
@@ -693,8 +693,19 @@
                 <subviews>
                     <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="79U-pS-Gbg" customClass="BlueprintView" customModule="constraint_solving" customModuleProvider="target">
                         <rect key="frame" x="20" y="20" width="440" height="279"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     </customView>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vgV-TV-1ib">
+                        <rect key="frame" x="14" y="312" width="81" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YuW-rt-d5H">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="test:" target="Voe-Tx-rLC" id="fcv-Cd-iWw"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
         </window>

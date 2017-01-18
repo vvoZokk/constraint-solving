@@ -12,7 +12,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var window: NSWindow!
-    @IBOutlet weak var blueprint: BlueprintView!
+    @IBOutlet weak var blueprintView: BlueprintView!
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -23,6 +23,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return true
+    }
+    
+    @IBAction func test(_: AnyObject) {
+        do {
+            let myPoint = Point2D()
+            print("test here: \(myPoint.vectorX)")
+            try myPoint.newPosition(parameter: 3, direction: [0.8, 0.6])
+            print("second test here:\(myPoint.vectorA), \(myPoint.p)")
+        } catch {
+            print("catch error")
+        }
+        
+    }
+ 
 }
 
