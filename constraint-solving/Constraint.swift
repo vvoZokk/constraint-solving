@@ -18,19 +18,21 @@ enum ConstraintType {
 // class for constraints
 class Constraint {
     var constraintType: ConstraintType
+    var constraintValue: Double
     weak var secondObject: Object?
 
     init() {
         constraintType = .none
+        constraintValue = 0.0
         secondObject = nil
     }
 
-    func changeType(type: ConstraintType, relation: Object?) {
+    func changeType(type: ConstraintType, value: Double, relation: Object?) throws {
         switch type {
         // add relation type check for constA
         default:
             constraintType = type
         }
-        
+        constraintValue = value
     }
 }

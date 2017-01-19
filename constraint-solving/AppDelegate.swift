@@ -28,16 +28,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @IBAction func test(_: AnyObject) {
+        let myPoint = Point2D()
+        let mySecPoint = Point2D()
         do {
-            let myPoint = Point2D()
-            print("test here: \(myPoint.vectorX)")
-            try myPoint.newPosition(parameter: 3, direction: [0.8, 0.6])
-            print("second test here:\(myPoint.vectorA), \(myPoint.p)")
+            //print("test here: \(myPoint.vectorX)")
+            try myPoint.newPosition(parameters: [1, 0, 50.4])
+            //print("second test here:\(myPoint.vectorA), \(myPoint.p)")
         } catch {
             print("catch error")
         }
-        
-    }
- 
-}
 
+        let blueprint = Blueprint()
+        blueprint.add(object: myPoint)
+        blueprint.add(object: mySecPoint)
+
+    }
+}
