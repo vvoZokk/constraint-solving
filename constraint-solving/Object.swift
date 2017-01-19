@@ -9,7 +9,7 @@
 import Foundation
 
 // base class for objects
-class Object: DataProtocol {
+class Object {
     static var count = 0
     let id: Int
     var dim: Int
@@ -28,20 +28,24 @@ class Object: DataProtocol {
         Object.count += 1
     }
 
-    func newPosition(parameters: [Double]) throws {
-    }
-    func addConstraint(constraint: Constraint, index: Int) throws {
-    }
-    internal func getSecondDerivativesFunc(offset: Int) -> [([Double]) -> Double] {
+    func getGradient(offset: Int) -> [([Double]) -> Double] {
         return Array<([Double]) -> Double>()
     }
-    internal func getDerivativesFunc(offset: Int) -> [([Double]) -> Double] {
-        return Array<([Double]) -> Double>()
+    func getHessian(offset: Int) -> [[([Double]) -> Double]] {
+        return Array<[([Double]) -> Double]>()
     }
-    internal func getInitValues(offset: Int) -> [Double] {
+    func getInitValues(offset: Int) -> [Double] {
         return Array<Double>()
     }
-    
+    func getQuantity() -> Int {
+        return 3
+    }
+    func setPosition(parameters: [Double]) throws {
+        // nothing
+    }
+    func addConstraint(constraint: Constraint, index: Int) throws {
+        // nothing
+    }
 }
 
 class Point2D: Object {
@@ -71,22 +75,25 @@ class Point2D: Object {
         constraints = Array<Constraint>(repeating: Constraint(), count: 2)
     }
     
-    override func newPosition(parameters: [Double]) throws {
-        if parameters.count != dim + 1 {
+    override func setPosition(parameters: [Double]) throws {
+        // dependent on constaraints
+        if parameters.count != dim + 2 {
             throw BluepintError.invalidParameters
         }
         var sum = 0.0
         for i in 0..<dim {
             sum += pow(parameters[i], 2)
         }
-        if sqrt(sum) - 1.0 > 1.0e-12 {
+        if sqrt(sum) - 1.0 > 1.0e-10 {
             throw BluepintError.invalidLengh
         }
-        vectorA = parameters
-        p = vectorA.removeLast()
+        for i in 0..<dim {
+            vectorA[i] = parameters[i]
+        }
+        p = parameters[dim]
     }
-    
-    override func getDerivativesFunc(offset: Int) -> [([Double]) -> Double] {
+
+    override func getGradient(offset: Int) -> [([Double]) -> Double] {
         var functions = Array<([Double]) -> Double>()
         var f = {(_: [Double]) -> Double in
             return 0.0
@@ -103,6 +110,7 @@ class Point2D: Object {
                 f = { (x: [Double]) -> Double in
                     return 2 * (x[offset + 2] - self.p)
                 }
+            // without constraints
             default:
                 f = { (x: [Double]) -> Double in
                     var sum = 0.0
@@ -115,24 +123,12 @@ class Point2D: Object {
             }
             functions.append(f)
         }
-        /*
-        func da0(x: [Double]) -> Double {
-            return 2 * (x[offset] - self.vectorA[0]) + 2 * x[offset] * x[offset + 3]
-        }
-        func da1(x: [Double]) -> Double {
-            return 2 * (x[offset + 1] - self.vectorA[1]) + 2 * x[offset + 1] * x[offset + 3]
-        }
-        func dp(x: [Double]) -> Double {
-            return 2 * (x[offset + 2] - self.p)
-        }
-        func dl(x: [Double]) -> Double {
-            return pow(self.vectorA[0], 2) + pow(self.vectorA[1], 2) - 1
-        }
-        */
+
         return functions
     }
-    
-    override func getSecondDerivativesFunc(offset: Int) -> [([Double]) -> Double] {
+
+    override func getHessian(offset: Int) -> [[([Double]) -> Double]] {
+
         func da02(x: [Double]) -> Double {
             return 2 + 2 * x[offset + 3]
         }
@@ -156,7 +152,7 @@ class Point2D: Object {
             return 0
         }
         func da1dl(x: [Double]) -> Double {
-            return 2 * x[offset]
+            return 2 * x[offset + 1]
         }
         
         func dpda0(x: [Double]) -> Double {
@@ -186,16 +182,21 @@ class Point2D: Object {
         }
         
         let m = [
-            da02, da0da1, da0dp, da0dl,
-            da1da0, da12, da1dp, da1dp,
-            dpda0, dpda1, dp2, dpdl,
-            dlda0, dlda1, dldp, dl2,
+            [da02, da0da1, da0dp, da0dl],
+            [da1da0, da12, da1dp, da1dl],
+            [dpda0, dpda1, dp2, dpdl],
+            [dlda0, dlda1, dldp, dl2],
             ]
         return m
     }
-    
+
     override func getInitValues(offset: Int) -> [Double] {
         let values = vectorA + [p, 0]
         return values
+    }
+
+    override func getQuantity() -> Int {
+        // dependent on constaraints
+        return dim + 2
     }
 }
