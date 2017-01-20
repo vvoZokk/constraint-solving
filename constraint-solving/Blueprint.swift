@@ -17,7 +17,7 @@ enum BluepintError: Error {
 }
 
 class Blueprint {
-    let accuracy = 1.0e-12
+    let accuracy = 1.0e-10
     var objects: [Int: Object]
 
     init() {
@@ -41,7 +41,7 @@ class Blueprint {
     private func getHessian(keys: [Int]) throws -> [[([Double]) -> Double]] {
         var result = Array<[([Double]) -> Double]>()
         var globalOffset = 0
-        let nullFunc = { (_: [Double]) -> Double in
+        let nullFunction = { (_: [Double]) -> Double in
             return 0
         }
         for key in keys {
@@ -49,10 +49,10 @@ class Blueprint {
             if localHessian != nil {
                 let dimension = localHessian!.count
                 for l in 0..<result.count {
-                    result[l] += Array<([Double]) -> Double>(repeating: nullFunc, count: dimension)
+                    result[l] += Array<([Double]) -> Double>(repeating: nullFunction, count: dimension)
                 }
                 for l in localHessian! {
-                    var line = Array<([Double]) -> Double>(repeating: nullFunc, count: globalOffset)
+                    var line = Array<([Double]) -> Double>(repeating: nullFunction, count: globalOffset)
                     line += l
                     result.append(line)
                 }
@@ -108,13 +108,13 @@ class Blueprint {
                 for _ in 0..<q {
                     position.append(positions.remove(at: 0))
                 }
-                print(positions, position)
+                //print(positions, position)
                 try objects[key]?.setPosition(parameters: position)
             }
         } catch BluepintError.invalidDimension {
             print("Error in position culculating: invalid dimension")
         } catch BluepintError.invalidLengh {
-            print("Error in position culculating: invalid length of directive vector")
+            print("Error in position culculating: invalid length of direction vector")
         } catch BluepintError.invalidParameters {
             print("Error in position culculating: invalid parameters")
         } catch {
@@ -152,15 +152,17 @@ class Blueprint {
                 if delta > max {
                     max = delta
                 }
+                print(iteration)
             }
         } while max > accuracy
+        print(result)
 
         return result
     }
 
     private func rowReduction(augmentedMatrix: inout [[Double]]) throws -> [Double] {
         let n = augmentedMatrix.count
-        //print(augmentedMatrix)
+        print(augmentedMatrix)
 
         func partialPivoting(index: Int) {
             var candidate = fabs(augmentedMatrix[index][index])

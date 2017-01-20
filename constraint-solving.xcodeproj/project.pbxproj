@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A613FDF1E31567300C3FD61 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A613FDE1E31567300C3FD61 /* Point.swift */; };
 		8A9061111E2EB7000075377D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9061101E2EB7000075377D /* AppDelegate.swift */; };
 		8A9061131E2EB7000075377D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A9061121E2EB7000075377D /* Assets.xcassets */; };
 		8A9061161E2EB7000075377D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A9061141E2EB7000075377D /* MainMenu.xib */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8A613FDE1E31567300C3FD61 /* Point.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
 		8A90610D1E2EB7000075377D /* constraint-solving.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "constraint-solving.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A9061101E2EB7000075377D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8A9061121E2EB7000075377D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -39,6 +41,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8A613FE01E31586A00C3FD61 /* Objects */ = {
+			isa = PBXGroup;
+			children = (
+				8A613FDE1E31567300C3FD61 /* Point.swift */,
+			);
+			name = Objects;
+			sourceTree = "<group>";
+		};
 		8A9061041E2EB7000075377D = {
 			isa = PBXGroup;
 			children = (
@@ -63,6 +73,7 @@
 				8A90611F1E2EC6FE0075377D /* Blueprint.swift */,
 				8A9061231E2F5EC30075377D /* Constraint.swift */,
 				8A9061211E2F5E5E0075377D /* Object.swift */,
+				8A613FE01E31586A00C3FD61 /* Objects */,
 				8A9061121E2EB7000075377D /* Assets.xcassets */,
 				8A9061141E2EB7000075377D /* MainMenu.xib */,
 				8A9061171E2EB7000075377D /* Info.plist */,
@@ -144,6 +155,7 @@
 			files = (
 				8A90611E1E2EB7250075377D /* BlueprintView.swift in Sources */,
 				8A9061201E2EC6FF0075377D /* Blueprint.swift in Sources */,
+				8A613FDF1E31567300C3FD61 /* Point.swift in Sources */,
 				8A9061221E2F5E5E0075377D /* Object.swift in Sources */,
 				8A9061241E2F5EC30075377D /* Constraint.swift in Sources */,
 				8A9061111E2EB7000075377D /* AppDelegate.swift in Sources */,
@@ -301,6 +313,7 @@
 				8A90611C1E2EB7000075377D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
