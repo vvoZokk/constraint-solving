@@ -15,7 +15,7 @@ class Point: Object {
         didSet {
             activeConstraints = 0
             for c in constraints {
-                if c.constraintType == ConstraintType.constX {
+                if c.type == ConstraintType.constX {
                     activeConstraints += 1
                 }
             }
@@ -69,10 +69,16 @@ class Point: Object {
             return 0.0
         }
         let correcton: Int
-        if dim != activeConstraints && checkConstraint(index: 0) {
-            correcton = 0
+        if dim != activeConstraints {
+            var count = 0
+            for i in 0..<dim-activeConstraints {
+                if !checkConstraint(i) {
+                    count += 1
+                }
+            }
+            correcton = count
         } else {
-            correcton = dim - activeConstraints
+            correcton = 0
         }
         print(correcton, activeConstraints)
 
@@ -83,7 +89,7 @@ class Point: Object {
                     let a = 2 * (x[offset + i] - self.vectorA[i])
                     let b = 2 * x[offset + i] * x[offset + self.dim + 1]
                     var c = 0.0
-                    if self.checkConstraint(index: i) {
+                    if self.checkConstraint(i) {
                         c = x[offset + self.dim] * x[offset + i + self.dim + 2 - correcton]
                     }
                     return a + b + c
@@ -92,7 +98,7 @@ class Point: Object {
                 f = { (x: [Double]) -> Double in
                     var a = 0.0
                     for j in 0..<self.constraints.count {
-                        if self.checkConstraint(index: j) {
+                        if self.checkConstraint(j) {
                             a += x[offset + j] * x[offset + j + self.dim + 2 - correcton]
                         }
                     }
@@ -109,7 +115,7 @@ class Point: Object {
             default:
                 let j = i - (self.dim + 2 - correcton)
                 f = { (x: [Double]) -> Double in
-                    return x[offset + j] * x[offset + self.dim] - self.constraints[j].constraintValue
+                    return x[offset + j] * x[offset + self.dim] - self.constraints[j].value
                 }
                 
             }
@@ -125,10 +131,16 @@ class Point: Object {
             return 0.0
         }
         let correcton: Int
-        if dim != activeConstraints && checkConstraint(index: 0) {
-            correcton = 0
+        if dim != activeConstraints {
+            var count = 0
+            for i in 0..<dim-activeConstraints {
+                if !checkConstraint(i) {
+                    count += 1
+                }
+            }
+            correcton = count
         } else {
-            correcton = dim - activeConstraints
+            correcton = 0
         }
 
         for i in 0..<dim + 2 + activeConstraints {
@@ -144,7 +156,7 @@ class Point: Object {
                             }
                         }
                     case dim:
-                        if self.checkConstraint(index: i) {
+                        if self.checkConstraint(i) {
                             line[j] = { (x: [Double]) -> Double in
                                 return x[offset + i + self.dim + 2 - correcton]
                             }
@@ -164,7 +176,7 @@ class Point: Object {
                 case dim:
                     switch j {
                     case 0..<dim:
-                        if checkConstraint(index: j) {
+                        if checkConstraint(j) {
                             line[j] = { (x: [Double]) -> Double in
                                 return x[offset + j + self.dim + 2 - correcton]
                             }
@@ -177,7 +189,7 @@ class Point: Object {
                         break
                     default:
                         let k = j - (dim + 2 - correcton)
-                        if checkConstraint(index: k) {
+                        if checkConstraint(k) {
                             line[j] = { (x: [Double]) -> Double in
                                 return x[offset + k]
                             }
@@ -203,7 +215,7 @@ class Point: Object {
                         }
                     case dim:
                         let k = i - (dim + 2 - correcton)
-                        if checkConstraint(index: k) {
+                        if checkConstraint(k) {
                             line[j] = { (x: [Double]) -> Double in
                                 return x[offset + k]
                             }
@@ -230,12 +242,16 @@ class Point: Object {
         return dim + 2 + activeConstraints
     }
 
-    override func addConstraint(constraint: Constraint, index: Int) throws {
-        constraints[index] = constraint
+    override func addConstraint(_ constraint: Constraint, index: Int) throws {
+        if constraint.type == ConstraintType.constX {
+            constraints[index] = constraint
+        } else {
+            throw BluepintError.invalidConstrain
+        }
     }
 
-    func checkConstraint(index: Int) -> Bool {
-        return constraints[index].constraintType == ConstraintType.constX
+    func checkConstraint(_ index: Int) -> Bool {
+        return constraints[index].type == ConstraintType.constX
     }
 }
 

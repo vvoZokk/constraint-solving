@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8A613FDF1E31567300C3FD61 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A613FDE1E31567300C3FD61 /* Point.swift */; };
+		8A613FE21E319A7E00C3FD61 /* StraightLineSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A613FE11E319A7E00C3FD61 /* StraightLineSegment.swift */; };
 		8A9061111E2EB7000075377D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9061101E2EB7000075377D /* AppDelegate.swift */; };
 		8A9061131E2EB7000075377D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A9061121E2EB7000075377D /* Assets.xcassets */; };
 		8A9061161E2EB7000075377D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A9061141E2EB7000075377D /* MainMenu.xib */; };
@@ -19,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		8A613FDE1E31567300C3FD61 /* Point.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
+		8A613FE11E319A7E00C3FD61 /* StraightLineSegment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StraightLineSegment.swift; sourceTree = "<group>"; };
 		8A90610D1E2EB7000075377D /* constraint-solving.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "constraint-solving.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A9061101E2EB7000075377D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8A9061121E2EB7000075377D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -45,6 +47,7 @@
 			isa = PBXGroup;
 			children = (
 				8A613FDE1E31567300C3FD61 /* Point.swift */,
+				8A613FE11E319A7E00C3FD61 /* StraightLineSegment.swift */,
 			);
 			name = Objects;
 			sourceTree = "<group>";
@@ -159,6 +162,7 @@
 				8A9061221E2F5E5E0075377D /* Object.swift in Sources */,
 				8A9061241E2F5EC30075377D /* Constraint.swift in Sources */,
 				8A9061111E2EB7000075377D /* AppDelegate.swift in Sources */,
+				8A613FE21E319A7E00C3FD61 /* StraightLineSegment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

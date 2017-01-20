@@ -30,7 +30,7 @@ class Blueprint {
 
     func add(constraint: Constraint, index: Int, to: Object){
         do {
-            try objects[to.id]?.addConstraint(constraint: constraint, index: index)
+            try objects[to.id]?.addConstraint(constraint, index: index)
         } catch BluepintError.invalidConstrain {
 
         } catch {
@@ -152,7 +152,6 @@ class Blueprint {
                 if delta > max {
                     max = delta
                 }
-                print(iteration)
             }
         } while max > accuracy
         print(result)
@@ -162,7 +161,7 @@ class Blueprint {
 
     private func rowReduction(augmentedMatrix: inout [[Double]]) throws -> [Double] {
         let n = augmentedMatrix.count
-        print(augmentedMatrix)
+        //print(augmentedMatrix)
 
         func partialPivoting(index: Int) {
             var candidate = fabs(augmentedMatrix[index][index])

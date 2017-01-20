@@ -42,7 +42,7 @@ class Object {
     func setPosition(parameters: [Double]) throws {
         // nothing
     }
-    func addConstraint(constraint: Constraint, index: Int) throws {
+    func addConstraint(_ constraint: Constraint, index: Int) throws {
         // nothing
     }
 }

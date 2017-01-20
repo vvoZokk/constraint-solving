@@ -10,6 +10,7 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    var blueprint = Blueprint()
 
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var blueprintView: BlueprintView!
@@ -30,20 +31,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func test(_: AnyObject) {
         let myPoint = Point2D()
         let mySecPoint = Point2D()
-        //let newP = Point2D()
+        let newP = Point2D()
         do {
             try myPoint.setPosition(parameters: [0.8, 0.6, 5, 0])
             try mySecPoint.setPosition(parameters: [0.6, 0.8, 5, 0])
             let simpleCon = Constraint()
             var con = Constraint()
-            try con.changeType(type: ConstraintType.constX, value: -3.8, relation: nil)
-            try simpleCon.changeType(type: ConstraintType.constX, value: 4.8, relation: nil)
-            try myPoint.addConstraint(constraint: simpleCon, index: 0)
-            try myPoint.addConstraint(constraint: con, index: 1)
-            let blueprint = Blueprint()
+            try con.changeType(ConstraintType.constX, value: -3.8, relation: nil)
+            try simpleCon.changeType(ConstraintType.constX, value: 4.8, relation: nil)
+            try myPoint.addConstraint(simpleCon, index: 0)
+            try myPoint.addConstraint(con, index: 1)
+            try mySecPoint.addConstraint(con, index: 1)
             blueprint.add(object: myPoint)
-            //blueprint.add(object: mySecPoint)
-            //blueprint.add(object: newP)
+            blueprint.add(object: mySecPoint)
+            blueprint.add(object: newP)
             print(myPoint.vectorX)
 
             blueprint.calculatePositions()
