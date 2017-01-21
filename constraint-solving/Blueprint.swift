@@ -177,7 +177,7 @@ class Blueprint {
         return result
     }
 
-    func calculatePositions() { // make throws
+    func calculatePositions() { // make throws... or String
         var keys = Array<Int>()
         var quantities = Array<(key: Int, quantity: Int)>()
         for (k, o) in objects {
@@ -192,7 +192,7 @@ class Blueprint {
                     position.append(positions.remove(at: 0))
                 }
                 //print(positions, position)
-                try objects[key]?.setPosition(parameters: position)
+                try objects[key]?.setParameters(position)
             }
         } catch BluepintError.invalidDimension {
             print("Error in position culculating: invalid dimension")

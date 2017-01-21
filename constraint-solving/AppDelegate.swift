@@ -30,17 +30,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
     }
-
-    @IBAction func test(_ sender: AnyObject) {
-        let myPoint = Point2D()
-        do {
-            try myPoint.setPosition(parameters: [0.8, 0.6, 5, 0])
-
-            blueprint.calculatePositions()
-            print(myPoint.vectorX)
-            print("calculation")
-        } catch {
-            print("catching error")
-        }
-    }
 }

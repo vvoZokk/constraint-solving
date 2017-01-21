@@ -21,46 +21,19 @@ class Point: Object {
             }
         }
     }
-    var vectorX: [Double] {
-        get {
-            var vector = Array<Double>()
-            for a in vectorA {
-                vector.append(p * a)
-            }
-            return vector
-        }
-        set {
-            var sum = 0.0
-            for v in newValue {
-                sum += pow(v, 2)
-            }
-            p = sqrt(sum)
-            for (i, v) in newValue.enumerated() {
-                vectorA[i] = v / p
-            }
-        }
-    }
-    
+
     override init(dimension: Int) {
         super.init(dimension: dimension)
         constraints = Array<Constraint>(repeating: Constraint(), count: dimension)
     }
     
-    override func setPosition(parameters: [Double]) throws {
-        if parameters.count != dim + 2 + activeConstraints {
+    override func setParameters(_ parameters: [Double]) throws {
+        if parameters.count != dim + activeConstraints {
             throw BluepintError.invalidParameters
-        }
-        var sum = 0.0
-        for i in 0..<dim {
-            sum += pow(parameters[i], 2)
-        }
-        if sqrt(sum) - 1.0 > 1.0e-7 {
-            throw BluepintError.invalidLengh
         }
         for i in 0..<dim {
             vectorA[i] = parameters[i]
         }
-        p = parameters[dim]
     }
     
     override func getGradient(offset: Int) -> [([Double]) -> Double] {
@@ -82,42 +55,23 @@ class Point: Object {
         }
         print(correcton, activeConstraints)
 
-        for i in 0..<dim + 2 + activeConstraints {
+        for i in 0..<dim+activeConstraints {
             switch i {
             case 0..<dim: // coordinates
                 f = { (x: [Double]) -> Double in
-                    let a = 2 * (x[offset + i] - self.vectorA[i])
-                    let b = 2 * x[offset + i] * x[offset + self.dim + 1]
-                    var c = 0.0
+                    let c: Double
                     if self.checkConstraint(i) {
-                        c = x[offset + self.dim] * x[offset + i + self.dim + 2 - correcton]
+                        c = x[offset + i + self.dim - correcton]
+                    } else {
+                        c = 0.0
                     }
-                    return a + b + c
+                    return 2 * (x[offset + i] - self.vectorA[i]) + c
                 }
-            case dim: // parameter
+            default: // lambda
+                let j = i - (dim - correcton)
                 f = { (x: [Double]) -> Double in
-                    var a = 0.0
-                    for j in 0..<self.constraints.count {
-                        if self.checkConstraint(j) {
-                            a += x[offset + j] * x[offset + j + self.dim + 2 - correcton]
-                        }
-                    }
-                    return 2 * (x[offset + self.dim] - self.p) + a
+                    return x[offset + j] - self.constraints[j].value
                 }
-            case dim + 1: // lambda
-                f = { (x: [Double]) -> Double in
-                    var sum = 0.0
-                    for j in 0..<self.dim {
-                        sum += pow(x[offset + j], 2)
-                    }
-                    return sum - 1
-                }
-            default:
-                let j = i - (self.dim + 2 - correcton)
-                f = { (x: [Double]) -> Double in
-                    return x[offset + j] * x[offset + self.dim] - self.constraints[j].value
-                }
-                
             }
             functions.append(f)
         }
@@ -143,81 +97,33 @@ class Point: Object {
             correcton = 0
         }
 
-        for i in 0..<dim + 2 + activeConstraints {
-            var line = Array<([Double]) -> Double>(repeatElement(nullFunction, count: dim + 2 + activeConstraints))
-            for j in 0..<dim + 2 + activeConstraints {
+        for i in 0..<dim+activeConstraints {
+            var line = Array<([Double]) -> Double>(repeatElement(nullFunction, count: dim + activeConstraints))
+            for j in 0..<dim+activeConstraints {
                 switch i {
                 case 0..<dim:
                     switch j {
                     case 0..<dim:
                         if i == j {
                             line[j] = { (x: [Double]) -> Double in
-                                return 2 + 2 * x[offset + self.dim + 1]
+                                return 2
                             }
-                        }
-                    case dim:
-                        if self.checkConstraint(i) {
-                            line[j] = { (x: [Double]) -> Double in
-                                return x[offset + i + self.dim + 2 - correcton]
-                            }
-                        }
-                    case dim + 1:
-                        line[j] = { (x: [Double]) -> Double in
-                            return 2 * x[offset + i]
                         }
                     default:
-                        let k = j - (dim + 2 - correcton)
+                        let k = j - (dim - correcton)
                         if i == k {
                             line[j] = { (x: [Double]) -> Double in
-                                return x[offset + self.dim]
+                                return 1
                             }
                         }
-                    }
-                case dim:
-                    switch j {
-                    case 0..<dim:
-                        if checkConstraint(j) {
-                            line[j] = { (x: [Double]) -> Double in
-                                return x[offset + j + self.dim + 2 - correcton]
-                            }
-                        }
-                    case dim:
-                        line[j] = { (x: [Double]) -> Double in
-                            return 2
-                        }
-                    case dim + 1:
-                        break
-                    default:
-                        let k = j - (dim + 2 - correcton)
-                        if checkConstraint(k) {
-                            line[j] = { (x: [Double]) -> Double in
-                                return x[offset + k]
-                            }
-                        }
-                    }
-                case dim + 1:
-                    switch j {
-                    case 0..<dim:
-                        line[j] = { (x: [Double]) -> Double in
-                            return 2 * x[offset + j]
-                        }
-                    default:
-                        break
                     }
                 default:
                     switch j {
                     case 0..<dim:
-                        let k = i - (dim + 2 - correcton)
+                        let k = i - (dim - correcton)
                         if j == k {
                             line[j] = { (x: [Double]) -> Double in
-                                return x[offset + self.dim]
-                            }
-                        }
-                    case dim:
-                        let k = i - (dim + 2 - correcton)
-                        if checkConstraint(k) {
-                            line[j] = { (x: [Double]) -> Double in
-                                return x[offset + k]
+                                return 1
                             }
                         }
                     default:
@@ -227,11 +133,12 @@ class Point: Object {
             }
             functions.append(line)
         }
+
         return functions
     }
     
     override func getInitValues(offset: Int) -> [Double] {
-        var values = vectorA + [p, 0]
+        var values = vectorA
         for _ in 0..<activeConstraints {
             values.append(0.0)
         }
@@ -239,21 +146,31 @@ class Point: Object {
     }
     
     override func getQuantity() -> Int {
-        return dim + 2 + activeConstraints
+        return dim + activeConstraints
     }
 
     override func getParameters() -> ([Double], id: Int, type: ObjectType) {
-        return (vectorX, id, .point)
+        return (vectorA, id, .point)
     }
 
     override func addConstraint(_ constraint: Constraint, index: Int) throws {
-        if index >= dim && index < 0 {
+        if index >= 0 && index < dim {
+            if constraint.type == ConstraintType.constX {
+                constraints[index] = constraint
+            } else {
+                throw BluepintError.invalidConstrain
+            }
+        } else {
             throw BluepintError.invalidDimension
         }
-        if constraint.type == ConstraintType.constX {
-            constraints[index] = constraint
+    }
+
+    func setCoordinates(_ coord: [Double]) -> Bool {
+        if coord.count == dim {
+            vectorA = coord
+            return true
         } else {
-            throw BluepintError.invalidConstrain
+            return false
         }
     }
 
@@ -268,6 +185,11 @@ class Point2D: Point {
     }
 
     override func getParameters() -> ([Double], id: Int, type: ObjectType) {
-        return (vectorX, id, .point2D)
+        return (vectorA, id, .point2D)
+    }
+
+    func setCoordinates(x: Double, y: Double) {
+        vectorA[0] = x
+        vectorA[1] = y
     }
 }

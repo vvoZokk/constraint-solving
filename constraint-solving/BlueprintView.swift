@@ -8,15 +8,16 @@
 
 import Cocoa
 
-enum ViewMode {
-    case none
-    case move
-    case addNewPoint
-    case addNewConstX
-    case addNewConstY
-}
-
 class BlueprintView: NSView {
+
+    enum ViewMode {
+        case none
+        case move
+        case addNewPoint
+        case addNewConstX
+        case addNewConstY
+    }
+
     let radius = 3.0
     @IBOutlet weak var output: NSTextField!
     @IBOutlet weak var input: NSTextField!
@@ -91,7 +92,7 @@ class BlueprintView: NSView {
             }
         case .addNewPoint:
             let point = Point2D()
-            point.vectorX = [Double(position.x), Double(position.y)]
+            point.setCoordinates(x: Double(position.x), y: Double(position.y))
             if controller != nil {
                 mode = .none
                 controller!.add(object: point)

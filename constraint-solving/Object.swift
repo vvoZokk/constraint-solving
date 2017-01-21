@@ -26,11 +26,11 @@ class Object {
     var constraints: [Constraint]
     
     init(dimension: Int) {
-        self.dim = dimension
-        self.id = Object.count
-        self.p = 1
-        self.vectorA = Array(repeating: 0.0, count: dimension - 1); vectorA += [1.0]
-        self.constraints = Array<Constraint>()
+        id = Object.count
+        dim = dimension
+        p = 1.0
+        vectorA = Array(repeating: 0.0, count: dimension - 1); vectorA += [1.0]
+        constraints = Array<Constraint>()
 
         Object.count += 1
     }
@@ -50,7 +50,7 @@ class Object {
     func getParameters() -> ([Double], id: Int, type: ObjectType) {
         return (vectorA, id, .unitVector)
     }
-    func setPosition(parameters: [Double]) throws {
+    func setParameters(_ parameters: [Double]) throws {
         // nothing
     }
     func addConstraint(_ constraint: Constraint, index: Int) throws {

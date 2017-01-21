@@ -787,9 +787,6 @@
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                         <font key="font" metaFont="miniSystem"/>
                                     </buttonCell>
-                                    <connections>
-                                        <action selector="test:" target="Voe-Tx-rLC" id="Oso-lX-zab"/>
-                                    </connections>
                                 </button>
                             </subviews>
                             <constraints>
