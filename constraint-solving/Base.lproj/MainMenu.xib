@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,7 +16,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="constraint_solving" customModuleProvider="target">
             <connections>
-                <outlet property="blueprintView" destination="79U-pS-Gbg" id="sYM-7y-2SI"/>
+                <outlet property="view" destination="79U-pS-Gbg" id="yMt-O9-5Kz"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="XUA-ZM-F9e"/>
             </connections>
         </customObject>
@@ -681,9 +682,9 @@
                 </menuItem>
             </items>
         </menu>
-        <window title="constraint-solving" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+        <window title="Geometry constraint solving" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="GCS" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="480" height="360"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <value key="minSize" type="size" width="480" height="360"/>
@@ -691,23 +692,158 @@
                 <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="79U-pS-Gbg" customClass="BlueprintView" customModule="constraint_solving" customModuleProvider="target">
-                        <rect key="frame" x="20" y="20" width="440" height="279"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    </customView>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vgV-TV-1ib">
-                        <rect key="frame" x="14" y="312" width="81" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YuW-rt-d5H">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="79U-pS-Gbg" customClass="BlueprintView" customModule="constraint_solving" customModuleProvider="target">
+                        <rect key="frame" x="5" y="30" width="417" height="280"/>
                         <connections>
-                            <action selector="test:" target="Voe-Tx-rLC" id="fcv-Cd-iWw"/>
+                            <outlet property="fixXButton" destination="YTr-Le-3bd" id="Nf8-iZ-ZcA"/>
+                            <outlet property="fixYButton" destination="yYd-uV-DkY" id="Csp-BE-nDf"/>
+                            <outlet property="input" destination="Mc6-hA-UhV" id="5ET-FQ-JsG"/>
+                            <outlet property="newPointButton" destination="bG7-mC-FIa" id="HPv-1S-buU"/>
+                            <outlet property="output" destination="T5y-te-6d4" id="i68-HK-Jfi"/>
                         </connections>
-                    </button>
+                    </customView>
+                    <box title="Constraint box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="U09-NY-ZG2">
+                        <rect key="frame" x="2" y="311" width="476" height="46"/>
+                        <view key="contentView" id="8Il-qX-pUQ">
+                            <rect key="frame" x="2" y="2" width="472" height="42"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YTr-Le-3bd">
+                                    <rect key="frame" x="5" y="7" width="70" height="30"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="70" id="8ME-pa-oYd"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="square" title="Fix X" bezelStyle="shadowlessSquare" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RXn-t6-O5a">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="fixXButtonClick:" target="79U-pS-Gbg" id="2H3-jo-lTp"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yYd-uV-DkY">
+                                    <rect key="frame" x="80" y="7" width="70" height="30"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="70" id="SML-dk-vkc"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="square" title="Fix Y" bezelStyle="shadowlessSquare" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9dZ-Pr-9Vz">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="fixYButtonClick:" target="79U-pS-Gbg" id="QzX-hs-6mG"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="yYd-uV-DkY" firstAttribute="leading" secondItem="YTr-Le-3bd" secondAttribute="trailing" constant="5" id="45Z-67-4wB"/>
+                                <constraint firstAttribute="bottom" secondItem="yYd-uV-DkY" secondAttribute="bottom" constant="7" id="6lR-Xt-X1H"/>
+                                <constraint firstAttribute="bottom" secondItem="YTr-Le-3bd" secondAttribute="bottom" constant="7" id="ELl-Cn-U83"/>
+                                <constraint firstItem="YTr-Le-3bd" firstAttribute="top" secondItem="8Il-qX-pUQ" secondAttribute="top" constant="5" id="LMZ-dI-ysZ"/>
+                                <constraint firstItem="yYd-uV-DkY" firstAttribute="top" secondItem="8Il-qX-pUQ" secondAttribute="top" constant="5" id="MBU-Pk-Cdy"/>
+                                <constraint firstItem="YTr-Le-3bd" firstAttribute="leading" secondItem="8Il-qX-pUQ" secondAttribute="leading" constant="5" id="Waq-ui-seQ"/>
+                            </constraints>
+                        </view>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="40" id="fUt-4q-v0l"/>
+                        </constraints>
+                    </box>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T5y-te-6d4">
+                        <rect key="frame" x="3" y="0.0" width="474" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="25" id="s0D-Gi-DMa"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Status: " usesSingleLineMode="YES" id="Fql-zg-fLN">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <box title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="8dm-VE-mLU">
+                        <rect key="frame" x="424" y="26" width="54" height="286"/>
+                        <view key="contentView" id="Irx-ow-fBI">
+                            <rect key="frame" x="2" y="2" width="50" height="282"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <button autoresizesSubviews="NO" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bG7-mC-FIa">
+                                    <rect key="frame" x="5" y="242" width="40" height="35"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="35" id="NmQ-vo-00Y"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="square" title="point" bezelStyle="shadowlessSquare" image="NSAddTemplate" imagePosition="below" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" inset="2" id="uZu-CB-4Lt">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                        <font key="font" metaFont="miniSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="newPointButtonClick:" target="79U-pS-Gbg" id="Kkl-Ke-f0d"/>
+                                    </connections>
+                                </button>
+                                <button autoresizesSubviews="NO" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7e-ki-nGq">
+                                    <rect key="frame" x="5" y="202" width="40" height="35"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="35" id="2i8-10-bwG"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="square" title="line" bezelStyle="shadowlessSquare" image="NSRemoveTemplate" imagePosition="below" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" inset="2" id="aHe-QT-4z7">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                        <font key="font" metaFont="miniSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="test:" target="Voe-Tx-rLC" id="Oso-lX-zab"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstAttribute="trailing" secondItem="p7e-ki-nGq" secondAttribute="trailing" constant="5" id="4BE-fc-XgB"/>
+                                <constraint firstAttribute="trailing" secondItem="bG7-mC-FIa" secondAttribute="trailing" constant="5" id="7Mz-h4-aeo"/>
+                                <constraint firstItem="bG7-mC-FIa" firstAttribute="leading" secondItem="Irx-ow-fBI" secondAttribute="leading" constant="5" id="7xr-Sc-J3I"/>
+                                <constraint firstItem="p7e-ki-nGq" firstAttribute="top" secondItem="bG7-mC-FIa" secondAttribute="bottom" constant="5" id="9rQ-gD-nqf"/>
+                                <constraint firstItem="p7e-ki-nGq" firstAttribute="leading" secondItem="Irx-ow-fBI" secondAttribute="leading" constant="5" id="c8d-tb-WLX"/>
+                                <constraint firstItem="bG7-mC-FIa" firstAttribute="top" secondItem="Irx-ow-fBI" secondAttribute="top" constant="5" id="oLU-hq-eH1"/>
+                            </constraints>
+                        </view>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="48" id="z1c-pa-lXX"/>
+                        </constraints>
+                    </box>
+                    <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mc6-hA-UhV">
+                        <rect key="frame" x="379" y="5" width="96" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="96" id="72w-jJ-3dG"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="iH7-LD-Azi">
+                            <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="Yfb-oR-YJY"/>
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                        <connections>
+                            <action selector="inputValue:" target="79U-pS-Gbg" id="rZb-kl-b3d"/>
+                        </connections>
+                    </textField>
                 </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="T5y-te-6d4" secondAttribute="bottom" id="1E8-Lv-5Ng"/>
+                    <constraint firstItem="U09-NY-ZG2" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="5" id="5My-gk-Zwx"/>
+                    <constraint firstItem="8dm-VE-mLU" firstAttribute="top" secondItem="U09-NY-ZG2" secondAttribute="bottom" constant="5" id="5g7-6u-Yk9"/>
+                    <constraint firstAttribute="trailing" secondItem="T5y-te-6d4" secondAttribute="trailing" constant="5" id="B28-Yq-aj1"/>
+                    <constraint firstAttribute="trailing" secondItem="U09-NY-ZG2" secondAttribute="trailing" constant="5" id="BcD-tr-DMX"/>
+                    <constraint firstItem="Mc6-hA-UhV" firstAttribute="top" secondItem="8dm-VE-mLU" secondAttribute="bottom" constant="5" id="Hvt-aB-WWP"/>
+                    <constraint firstItem="T5y-te-6d4" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="5" id="ILh-DB-dg0"/>
+                    <constraint firstAttribute="bottom" secondItem="Mc6-hA-UhV" secondAttribute="bottom" constant="5" id="PYK-IO-EjX"/>
+                    <constraint firstAttribute="trailing" secondItem="Mc6-hA-UhV" secondAttribute="trailing" constant="5" id="Tpp-Jn-uoH"/>
+                    <constraint firstItem="79U-pS-Gbg" firstAttribute="top" secondItem="U09-NY-ZG2" secondAttribute="bottom" constant="5" id="VVn-i3-tSZ"/>
+                    <constraint firstItem="T5y-te-6d4" firstAttribute="top" secondItem="8dm-VE-mLU" secondAttribute="bottom" constant="5" id="aVM-dF-zYi"/>
+                    <constraint firstAttribute="trailing" secondItem="8dm-VE-mLU" secondAttribute="trailing" constant="5" id="cDr-iT-m73"/>
+                    <constraint firstItem="8dm-VE-mLU" firstAttribute="leading" secondItem="79U-pS-Gbg" secondAttribute="trailing" constant="5" id="f13-EF-XG7"/>
+                    <constraint firstItem="79U-pS-Gbg" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="5" id="hkw-x6-zhH"/>
+                    <constraint firstItem="T5y-te-6d4" firstAttribute="top" secondItem="79U-pS-Gbg" secondAttribute="bottom" constant="5" id="qR5-LF-Gnm"/>
+                    <constraint firstItem="U09-NY-ZG2" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="5" id="ttE-7P-eom"/>
+                </constraints>
             </view>
         </window>
     </objects>
+    <resources>
+        <image name="NSAddTemplate" width="11" height="11"/>
+        <image name="NSRemoveTemplate" width="11" height="11"/>
+    </resources>
 </document>

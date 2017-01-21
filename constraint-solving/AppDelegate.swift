@@ -13,8 +13,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var blueprint = Blueprint()
 
     @IBOutlet weak var window: NSWindow!
-    @IBOutlet weak var blueprintView: BlueprintView!
-
+    @IBOutlet weak var view: BlueprintView! {
+        didSet {
+            view.controller = blueprint
+        }
+    }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
@@ -27,29 +30,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
     }
-    
-    @IBAction func test(_: AnyObject) {
+
+    @IBAction func test(_ sender: AnyObject) {
         let myPoint = Point2D()
-        let mySecPoint = Point2D()
-        let newP = Point2D()
         do {
             try myPoint.setPosition(parameters: [0.8, 0.6, 5, 0])
-            try mySecPoint.setPosition(parameters: [0.6, 0.8, 5, 0])
-            let simpleCon = Constraint()
-            var con = Constraint()
-            try con.changeType(ConstraintType.constX, value: -3.8, relation: nil)
-            try simpleCon.changeType(ConstraintType.constX, value: 4.8, relation: nil)
-            try myPoint.addConstraint(simpleCon, index: 0)
-            try myPoint.addConstraint(con, index: 1)
-            try mySecPoint.addConstraint(con, index: 1)
-            blueprint.add(object: myPoint)
-            blueprint.add(object: mySecPoint)
-            blueprint.add(object: newP)
-            print(myPoint.vectorX)
 
             blueprint.calculatePositions()
             print(myPoint.vectorX)
-            print("")
+            print("calculation")
         } catch {
             print("catching error")
         }

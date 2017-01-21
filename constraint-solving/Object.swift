@@ -8,6 +8,14 @@
 
 import Foundation
 
+enum ObjectType {
+    case unitVector
+    case point
+    case straightLineSegment
+    case point2D
+    case straightLineSegment2D
+}
+
 // base class for objects
 class Object {
     static var count = 0
@@ -38,6 +46,9 @@ class Object {
     }
     func getQuantity() -> Int {
         return 3
+    }
+    func getParameters() -> ([Double], id: Int, type: ObjectType) {
+        return (vectorA, id, .unitVector)
     }
     func setPosition(parameters: [Double]) throws {
         // nothing

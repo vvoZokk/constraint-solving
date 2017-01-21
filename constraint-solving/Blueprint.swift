@@ -28,9 +28,9 @@ class Blueprint {
         objects[object.id] = object
     }
 
-    func add(constraint: Constraint, index: Int, to: Object){
+    func add(constraint: Constraint, index: Int, to: Int){
         do {
-            try objects[to.id]?.addConstraint(constraint, index: index)
+            try objects[to]?.addConstraint(constraint, index: index)
         } catch BluepintError.invalidConstrain {
 
         } catch {
@@ -92,34 +92,6 @@ class Blueprint {
             }
         }
         return result
-    }
-
-    func calculatePositions() {
-        var keys = Array<Int>()
-        var quantities = Array<(key: Int, quantity: Int)>()
-        for (k, o) in objects {
-            keys.append(k)
-            quantities.append((key: k, quantity: o.getQuantity()))
-        }
-        do {
-            var positions = try findOptimum(keys: keys)
-            for (key, q) in quantities {
-                var position = Array<Double>()
-                for _ in 0..<q {
-                    position.append(positions.remove(at: 0))
-                }
-                //print(positions, position)
-                try objects[key]?.setPosition(parameters: position)
-            }
-        } catch BluepintError.invalidDimension {
-            print("Error in position culculating: invalid dimension")
-        } catch BluepintError.invalidLengh {
-            print("Error in position culculating: invalid length of direction vector")
-        } catch BluepintError.invalidParameters {
-            print("Error in position culculating: invalid parameters")
-        } catch {
-            print("Error in position culculating")
-        }
     }
 
     private func findOptimum(keys: [Int]) throws -> [Double] {
@@ -203,5 +175,42 @@ class Blueprint {
             }
         }
         return result
+    }
+
+    func calculatePositions() { // make throws
+        var keys = Array<Int>()
+        var quantities = Array<(key: Int, quantity: Int)>()
+        for (k, o) in objects {
+            keys.append(k)
+            quantities.append((key: k, quantity: o.getQuantity()))
+        }
+        do {
+            var positions = try findOptimum(keys: keys)
+            for (key, q) in quantities {
+                var position = Array<Double>()
+                for _ in 0..<q {
+                    position.append(positions.remove(at: 0))
+                }
+                //print(positions, position)
+                try objects[key]?.setPosition(parameters: position)
+            }
+        } catch BluepintError.invalidDimension {
+            print("Error in position culculating: invalid dimension")
+        } catch BluepintError.invalidLengh {
+            print("Error in position culculating: invalid length of direction vector")
+        } catch BluepintError.invalidParameters {
+            print("Error in position culculating: invalid parameters")
+        } catch {
+            print("Error in position culculating")
+        }
+    }
+
+    func getDisplayedObjects() -> [Int: (type: ObjectType, [Double])] {
+        var list = Dictionary<Int, (ObjectType, [Double])>()
+        for o in objects.values {
+            let (coordinates, id, type) = o.getParameters()
+            list[id] = (type, coordinates)
+        }
+        return list
     }
 }

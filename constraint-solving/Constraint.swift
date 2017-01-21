@@ -27,6 +27,12 @@ class Constraint {
         secondObject = nil
     }
 
+    init(type: ConstraintType, value: Double, relation: Object?) {
+        self.type = type
+        self.value = value
+        secondObject = relation
+    }
+
     func changeType(_ type: ConstraintType, value: Double, relation: Object?) throws {
         switch type {
         // add relation type check for constA

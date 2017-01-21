@@ -32,7 +32,7 @@ class Point: Object {
         set {
             var sum = 0.0
             for v in newValue {
-                sum += v
+                sum += pow(v, 2)
             }
             p = sqrt(sum)
             for (i, v) in newValue.enumerated() {
@@ -242,7 +242,14 @@ class Point: Object {
         return dim + 2 + activeConstraints
     }
 
+    override func getParameters() -> ([Double], id: Int, type: ObjectType) {
+        return (vectorX, id, .point)
+    }
+
     override func addConstraint(_ constraint: Constraint, index: Int) throws {
+        if index >= dim && index < 0 {
+            throw BluepintError.invalidDimension
+        }
         if constraint.type == ConstraintType.constX {
             constraints[index] = constraint
         } else {
@@ -258,5 +265,9 @@ class Point: Object {
 class Point2D: Point {
     required init() {
         super.init(dimension: 2)
+    }
+
+    override func getParameters() -> ([Double], id: Int, type: ObjectType) {
+        return (vectorX, id, .point2D)
     }
 }
