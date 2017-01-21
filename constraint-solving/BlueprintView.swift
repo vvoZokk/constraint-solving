@@ -19,6 +19,7 @@ class BlueprintView: NSView {
     }
 
     let radius = 3.0
+    let threshold = 2.0
     @IBOutlet weak var output: NSTextField!
     @IBOutlet weak var input: NSTextField!
     @IBOutlet weak var newPointButton: NSButton!
@@ -26,6 +27,8 @@ class BlueprintView: NSView {
     @IBOutlet weak var fixYButton: NSButton!
     weak var controller: Blueprint?
     var mode = ViewMode.none
+    var lastPosition = NSPoint()
+    var position = NSPoint()
     var objects = Dictionary<Int, (type: ObjectType, [Double])>()
     var selected = Set<Int>()
 
@@ -50,10 +53,10 @@ class BlueprintView: NSView {
         mainColor.setFill()
         borderColor.setStroke()
         for o in objects {
-            let (type, x) = o.value
+            let (type, c) = o.value
             switch type {
             case .point2D:
-                let square = NSRect(x: x[0] - radius, y: x[1] - radius, width: 2 * radius, height: 2 * radius)
+                let square = NSRect(x: c[0] - radius, y: c[1] - radius, width: 2 * radius, height: 2 * radius)
                 path = NSBezierPath(ovalIn: square)
                 path.fill()
                 if selected.contains(o.key) {
@@ -64,25 +67,35 @@ class BlueprintView: NSView {
                 break
             }
         }
+        switch mode {
+        case .move:
+            path.lineWidth = 1
+            path.move(to: lastPosition)
+            path.line(to: position)
+            path.stroke()
+        default:
+            break
+        }
     }
 
     override func mouseDown(with event: NSEvent) {
-        let position = self.convert(event.locationInWindow, from: nil)
-        output.stringValue = String(format: "Status: last position (%.2f; %.2f)", position.x, position.y)
+        let pos = self.convert(event.locationInWindow, from: nil)
+        lastPosition = pos
+        output.stringValue = String(format: "Status: last position (%.2f; %.2f)", pos.x, pos.y)
         switch mode {
         case .none:
             for o in objects {
                 let (type, x) = o.value
                 switch type {
                 case .point2D:
-                    let lenght = pow(x[0] - Double(position.x), 2) + pow(x[1] - Double(position.y), 2)
-                    if sqrt(lenght) < 2 * radius {
+                    let lenght = pow(x[0] - Double(pos.x), 2) + pow(x[1] - Double(pos.y), 2)
+                    if sqrt(lenght) < threshold * radius {
                         if selected.contains(o.key) {
                             selected.remove(o.key)
-                            output.stringValue = String(format: "Status: point #%d unselected", o.key)
+                            output.stringValue = "Status: point #\(o.key) unselected"
                         } else{
                             selected.insert(o.key)
-                            output.stringValue = String(format: "Status: point #%d selected", o.key)
+                            output.stringValue = "Status: point #\(o.key) selected"
                         }
                         self.needsDisplay = true
                     }
@@ -92,14 +105,17 @@ class BlueprintView: NSView {
             }
         case .addNewPoint:
             let point = Point2D()
-            point.setCoordinates(x: Double(position.x), y: Double(position.y))
+            point.setCoordinates(x: Double(pos.x), y: Double(pos.y))
             if controller != nil {
                 mode = .none
                 controller!.add(object: point)
-                controller!.calculatePositions()
+                if let status = controller!.calculatePositions() {
+                    output.stringValue = "String: " + status
+                } else {
+                    output.stringValue = String(format: "Status: added new point, X = %.2f Y = %.2f", pos.x, pos.y)
+                }
                 objects = controller!.getDisplayedObjects()
                 newPointButton.setNextState()
-                output.stringValue = String(format: "Status: added new point, X = %.2f Y = %.2f", position.x, position.y)
                 self.needsDisplay = true
             } else {
                 output.stringValue = "Status: controler fault"
@@ -110,8 +126,59 @@ class BlueprintView: NSView {
     }
 
     override func mouseDragged(with event: NSEvent) {
-        if mode == .none {
-            output.stringValue = "Status: move"
+        switch mode {
+        case .none:
+            if !selected.isEmpty {
+                position = self.convert(event.locationInWindow, from: nil)
+                let r = CGFloat(radius)
+                if fabs(position.x - lastPosition.x) > r || fabs(position.y - lastPosition.y) > r {
+                    mode = .move
+                    output.stringValue = "Status: move"
+                }
+            }
+        case .move:
+            position = self.convert(event.locationInWindow, from: nil)
+            self.needsDisplay = true
+        default:
+            break
+        }
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        switch mode {
+        case .move:
+            let pos = self.convert(event.locationInWindow, from: nil)
+            if controller != nil {
+                mode = .none
+                for id in selected {
+                    if objects[id] != nil {
+                        var (type, c) = objects[id]!
+                        switch type {
+                        case .point2D:
+                            c[0] += Double(pos.x - lastPosition.x)
+                            c[1] += Double(pos.y - lastPosition.y)
+                            if let status = controller!.setCoordinates(to: id, coordinates: c) {
+                                output.stringValue = "Status: " + status
+                            }
+                        default:
+                            break
+                        }
+                    } else {
+                        output.stringValue = "Status: object #\(id) not exist"
+                    }
+                }
+                if let status = controller!.calculatePositions() {
+                    output.stringValue = "String: " + status
+                } else {
+                    output.stringValue = "Status:"
+                }
+                objects = controller!.getDisplayedObjects()
+                self.needsDisplay = true
+            } else {
+                output.stringValue = "Status: controler fault"
+            }
+        default:
+            break
         }
     }
 
@@ -196,9 +263,12 @@ class BlueprintView: NSView {
                     controller!.add(constraint: const, index: index, to: id)
                 }
                 mode = .none
-                controller!.calculatePositions()
+                if let status = controller!.calculatePositions() {
+                    output.stringValue = "Status: " + status
+                } else {
+                    output.stringValue = "Status: add constraint for \(selected.count) objects"
+                }
                 objects = controller!.getDisplayedObjects()
-                output.stringValue = "Status: add constraint for \(selected.count) objects"
                 input.stringValue = ""
                 input.isEnabled = false
                 selected.removeAll()

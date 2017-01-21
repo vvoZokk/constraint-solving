@@ -27,15 +27,6 @@ class Point: Object {
         constraints = Array<Constraint>(repeating: Constraint(), count: dimension)
     }
     
-    override func setParameters(_ parameters: [Double]) throws {
-        if parameters.count != dim + activeConstraints {
-            throw BluepintError.invalidParameters
-        }
-        for i in 0..<dim {
-            vectorA[i] = parameters[i]
-        }
-    }
-    
     override func getGradient(offset: Int) -> [([Double]) -> Double] {
         var functions = Array<([Double]) -> Double>()
         var f = { (_: [Double]) -> Double in
@@ -165,12 +156,20 @@ class Point: Object {
         }
     }
 
-    func setCoordinates(_ coord: [Double]) -> Bool {
-        if coord.count == dim {
-            vectorA = coord
-            return true
+    override func setParameters(_ parameters: [Double]) throws {
+        if parameters.count != dim + activeConstraints {
+            throw BluepintError.invalidParameters
+        }
+        for i in 0..<dim {
+            vectorA[i] = parameters[i]
+        }
+    }
+
+    override func setCoordinates(_ coordinates: [Double]) throws {
+        if coordinates.count == dim {
+            vectorA = coordinates
         } else {
-            return false
+            throw BluepintError.invalidDimension
         }
     }
 

@@ -53,6 +53,9 @@ class Object {
     func setParameters(_ parameters: [Double]) throws {
         // nothing
     }
+    func setCoordinates(_ coordinates: [Double]) throws {
+        // nothing
+    }
     func addConstraint(_ constraint: Constraint, index: Int) throws {
         // nothing
     }

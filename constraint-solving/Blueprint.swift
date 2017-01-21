@@ -177,7 +177,7 @@ class Blueprint {
         return result
     }
 
-    func calculatePositions() { // make throws... or String
+    func calculatePositions() -> String? {
         var keys = Array<Int>()
         var quantities = Array<(key: Int, quantity: Int)>()
         for (k, o) in objects {
@@ -194,14 +194,15 @@ class Blueprint {
                 //print(positions, position)
                 try objects[key]?.setParameters(position)
             }
+            return nil
         } catch BluepintError.invalidDimension {
-            print("Error in position culculating: invalid dimension")
+            return "position culculation error: invalid dimension"
         } catch BluepintError.invalidLengh {
-            print("Error in position culculating: invalid length of direction vector")
+            return "position culculation error: invalid length of direction vector"
         } catch BluepintError.invalidParameters {
-            print("Error in position culculating: invalid parameters")
+            return "position culculation error: invalid parameters"
         } catch {
-            print("Error in position culculating")
+            return "position culculation error"
         }
     }
 
@@ -212,5 +213,21 @@ class Blueprint {
             list[id] = (type, coordinates)
         }
         return list
+    }
+
+    func setCoordinates(to id: Int, coordinates: [Double]) -> String? {
+        do {
+            let o = objects[id]
+            if o != nil {
+                try objects[id]!.setCoordinates(coordinates)
+            } else {
+                throw BluepintError.invalidObjectKey
+            }
+            return nil
+        } catch BluepintError.invalidObjectKey {
+            return "coordinates error: invalid object's id: \(id)"
+        } catch {
+            return "coordinates error: invalid coordinates (object #\(id))"
+        }
     }
 }
