@@ -699,6 +699,7 @@
                             <outlet property="fixYButton" destination="yYd-uV-DkY" id="Csp-BE-nDf"/>
                             <outlet property="input" destination="Mc6-hA-UhV" id="5ET-FQ-JsG"/>
                             <outlet property="newPointButton" destination="bG7-mC-FIa" id="HPv-1S-buU"/>
+                            <outlet property="newSLSButton" destination="p7e-ki-nGq" id="OQz-AQ-eAh"/>
                             <outlet property="output" destination="T5y-te-6d4" id="i68-HK-Jfi"/>
                         </connections>
                     </customView>
@@ -787,6 +788,9 @@
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                         <font key="font" metaFont="miniSystem"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="newSLSButtonClick:" target="79U-pS-Gbg" id="77p-85-Gpz"/>
+                                    </connections>
                                 </button>
                             </subviews>
                             <constraints>

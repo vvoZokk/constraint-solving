@@ -191,7 +191,6 @@ class Blueprint {
                 for _ in 0..<q {
                     position.append(positions.remove(at: 0))
                 }
-                //print(positions, position)
                 try objects[key]?.setParameters(position)
             }
             return nil
@@ -209,7 +208,7 @@ class Blueprint {
     func getDisplayedObjects() -> [Int: (type: ObjectType, [Double])] {
         var list = Dictionary<Int, (ObjectType, [Double])>()
         for o in objects.values {
-            let (coordinates, id, type) = o.getParameters()
+            let (coordinates, id, type) = o.getCoordinates()
             list[id] = (type, coordinates)
         }
         return list

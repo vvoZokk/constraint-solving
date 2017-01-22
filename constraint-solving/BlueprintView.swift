@@ -14,6 +14,8 @@ class BlueprintView: NSView {
         case none
         case move
         case addNewPoint
+        case addNewSLS0
+        case addNewSLS
         case addNewConstX
         case addNewConstY
     }
@@ -23,6 +25,7 @@ class BlueprintView: NSView {
     @IBOutlet weak var output: NSTextField!
     @IBOutlet weak var input: NSTextField!
     @IBOutlet weak var newPointButton: NSButton!
+    @IBOutlet weak var newSLSButton: NSButton!
     @IBOutlet weak var fixXButton: NSButton!
     @IBOutlet weak var fixYButton: NSButton!
     weak var controller: Blueprint?
@@ -51,11 +54,11 @@ class BlueprintView: NSView {
         path.stroke()
         borderColor = NSColor.init(red: 0.9, green: 0.9, blue: 0.3, alpha: 1)
         mainColor.setFill()
-        borderColor.setStroke()
         for o in objects {
             let (type, c) = o.value
             switch type {
             case .point2D:
+                borderColor.setStroke()
                 let square = NSRect(x: c[0] - radius, y: c[1] - radius, width: 2 * radius, height: 2 * radius)
                 path = NSBezierPath(ovalIn: square)
                 path.fill()
@@ -63,13 +66,24 @@ class BlueprintView: NSView {
                     path.lineWidth = CGFloat(radius)
                     path.stroke()
                 }
+            case .straightLineSegment2D:
+                mainColor.setStroke()
+                path = NSBezierPath()
+                path.lineWidth = CGFloat(radius)
+                path.move(to: NSPoint(x: c[0], y: c[1]))
+                path.line(to: NSPoint(x: c[2], y: c[3]))
+                path.stroke()
+                let square = NSRect(x: c[0] - radius, y: c[1] - radius, width: 2 * radius, height: 2 * radius)
+                path = NSBezierPath(ovalIn: square)
+                path.fill()
             default:
                 break
             }
         }
         switch mode {
         case .move:
-            path.lineWidth = 1
+            borderColor.setStroke()
+            path = NSBezierPath()
             path.move(to: lastPosition)
             path.line(to: position)
             path.stroke()
@@ -104,8 +118,7 @@ class BlueprintView: NSView {
                 }
             }
         case .addNewPoint:
-            let point = Point2D()
-            point.setCoordinates(x: Double(pos.x), y: Double(pos.y))
+            let point = Point2D(x: Double(pos.x), y: Double(pos.y))
             if controller != nil {
                 mode = .none
                 controller!.add(object: point)
@@ -116,6 +129,27 @@ class BlueprintView: NSView {
                 }
                 objects = controller!.getDisplayedObjects()
                 newPointButton.setNextState()
+                self.needsDisplay = true
+            } else {
+                output.stringValue = "Status: controler fault"
+            }
+        case .addNewSLS0:
+            position = pos
+            output.stringValue = "Status: select second point position"
+            mode = .addNewSLS
+        case .addNewSLS:
+            let lineSegment = StraightLineSegment2D(x0: Double(position.x), y0: Double(position.y), x1: Double(pos.x), y1: Double(pos.y))
+            //output.stringValue = " \(lineSegment.vectorA), \(lineSegment.vectorX)"
+            if controller != nil {
+                mode = .none
+                controller!.add(object: lineSegment)
+                if let status = controller!.calculatePositions() {
+                    output.stringValue = "String: " + status
+                } else {
+                    output.stringValue = "Status: added new line"
+                }
+                objects = controller!.getDisplayedObjects()
+                newSLSButton.setNextState()
                 self.needsDisplay = true
             } else {
                 output.stringValue = "Status: controler fault"
@@ -195,6 +229,19 @@ class BlueprintView: NSView {
         }
     }
 
+    @IBAction func newSLSButtonClick(_ sender: AnyObject) {
+        switch mode {
+        case .none:
+            output.stringValue = "Status: select first point position"
+            mode = .addNewSLS0
+        case .addNewSLS0, .addNewSLS:
+            output.stringValue = "Status: aborted"
+            mode = .none
+        default:
+            break
+        }
+    }
+
     @IBAction func fixXButtonClick(_ sender: AnyObject) {
         switch mode {
         case .none:
@@ -240,6 +287,8 @@ class BlueprintView: NSView {
         case .addNewConstY:
             output.stringValue = "Status: aborted"
             mode = .none
+            input.stringValue = ""
+            input.isEnabled = false
         default:
             fixYButton.setNextState()
         }

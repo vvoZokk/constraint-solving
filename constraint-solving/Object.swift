@@ -47,13 +47,13 @@ class Object {
     func getQuantity() -> Int {
         return 3
     }
-    func getParameters() -> ([Double], id: Int, type: ObjectType) {
+    func getCoordinates() -> ([Double], id: Int, type: ObjectType) {
         return (vectorA, id, .unitVector)
     }
-    func setParameters(_ parameters: [Double]) throws {
+    func setCoordinates(_ coordinates: [Double]) throws {
         // nothing
     }
-    func setCoordinates(_ coordinates: [Double]) throws {
+    func setParameters(_ parameters: [Double]) throws {
         // nothing
     }
     func addConstraint(_ constraint: Constraint, index: Int) throws {

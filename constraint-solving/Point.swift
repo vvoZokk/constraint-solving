@@ -44,7 +44,6 @@ class Point: Object {
         } else {
             correcton = 0
         }
-        print(correcton, activeConstraints)
 
         for i in 0..<dim+activeConstraints {
             switch i {
@@ -140,17 +139,13 @@ class Point: Object {
         return dim + activeConstraints
     }
 
-    override func getParameters() -> ([Double], id: Int, type: ObjectType) {
+    override func getCoordinates() -> ([Double], id: Int, type: ObjectType) {
         return (vectorA, id, .point)
     }
 
-    override func addConstraint(_ constraint: Constraint, index: Int) throws {
-        if index >= 0 && index < dim {
-            if constraint.type == ConstraintType.constX {
-                constraints[index] = constraint
-            } else {
-                throw BluepintError.invalidConstrain
-            }
+    override func setCoordinates(_ coordinates: [Double]) throws {
+        if coordinates.count == dim {
+            vectorA = coordinates
         } else {
             throw BluepintError.invalidDimension
         }
@@ -165,9 +160,13 @@ class Point: Object {
         }
     }
 
-    override func setCoordinates(_ coordinates: [Double]) throws {
-        if coordinates.count == dim {
-            vectorA = coordinates
+    override func addConstraint(_ constraint: Constraint, index: Int) throws {
+        if index >= 0 && index < dim {
+            if constraint.type == ConstraintType.constX {
+                constraints[index] = constraint
+            } else {
+                throw BluepintError.invalidConstrain
+            }
         } else {
             throw BluepintError.invalidDimension
         }
@@ -183,12 +182,16 @@ class Point2D: Point {
         super.init(dimension: 2)
     }
 
-    override func getParameters() -> ([Double], id: Int, type: ObjectType) {
+    required init(x: Double, y: Double) {
+        super.init(dimension: 2)
+        vectorA = [x, y]
+    }
+
+    override func getCoordinates() -> ([Double], id: Int, type: ObjectType) {
         return (vectorA, id, .point2D)
     }
 
     func setCoordinates(x: Double, y: Double) {
-        vectorA[0] = x
-        vectorA[1] = y
+        vectorA = [x, y]
     }
 }
