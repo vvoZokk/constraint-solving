@@ -15,7 +15,7 @@ class StraightLineSegment: Object {
         didSet {
             activeConstraints = 0
             for c in constraints {
-                if c.type == ConstraintType.constX {
+                if c.type != .none {
                     activeConstraints += 1
                 }
             }
@@ -45,7 +45,7 @@ class StraightLineSegment: Object {
     override init(dimension: Int) {
         vectorX = Array(repeating: 0.0, count: dimension - 1); vectorX += [1.0]
         super.init(dimension: dimension)
-        constraints = Array<Constraint>(repeating: Constraint(), count: dimension) // + 1
+        constraints = Array<Constraint>(repeating: Constraint(), count: dimension + 1)
     }
 
     override func getGradient(offset: Int) -> [([Double]) -> Double] {
@@ -54,9 +54,10 @@ class StraightLineSegment: Object {
             return 0.0
         }
         let correcton: Int
-        if dim != activeConstraints {
+        // it's bad solution
+        if activeConstraints != dim + 1 {
             var count = 0
-            for i in 0..<dim-activeConstraints {
+            for i in 0..<dim+1-activeConstraints {
                 if !checkConstraint(i) {
                     count += 1
                 }
@@ -71,7 +72,7 @@ class StraightLineSegment: Object {
             case 0..<dim: // first point coordinates
                 f = { (x: [Double]) -> Double in
                     let c: Double
-                    if self.checkConstraint(i) {
+                    if self.checkConstraintX(i) {
                         c = x[offset + i + 2 * self.dim + 2 - correcton]
                     } else {
                         c = 0.0
@@ -87,7 +88,12 @@ class StraightLineSegment: Object {
                 }
             case 2 * dim: // parameter
                 f = { (x: [Double]) -> Double in
-                    let c = 0.0
+                    let c: Double
+                    if self.checkConstraintP(self.dim) {
+                        c = x[offset + 2 * self.dim + 4 - correcton]
+                    } else {
+                        c = 0.0
+                    }
                     return 2 * (x[offset + 2 * self.dim] - self.p) + c
                 }
             case 2 * dim + 1: // lambda
@@ -100,8 +106,15 @@ class StraightLineSegment: Object {
                 }
             default:
                 let j = i - (2 * dim + 2 - correcton)
-                f = { (x: [Double]) -> Double in
-                    return x[offset + j] - self.constraints[j].value
+                if checkConstraintX(j) {
+                    f = { (x: [Double]) -> Double in
+                        return x[offset + j] - self.constraints[j].value
+                    }
+                }
+                if checkConstraintP(dim) {
+                    f = { (x: [Double]) -> Double in
+                        return x[offset + 2 * self.dim] - self.constraints[j].value
+                    }
                 }
             }
             functions.append(f)
@@ -116,9 +129,10 @@ class StraightLineSegment: Object {
             return 0.0
         }
         let correcton: Int
-        if dim != activeConstraints {
+        // it's bad solution
+        if activeConstraints != dim + 1 {
             var count = 0
-            for i in 0..<dim-activeConstraints {
+            for i in 0..<dim+1-activeConstraints {
                 if !checkConstraint(i) {
                     count += 1
                 }
@@ -172,7 +186,11 @@ class StraightLineSegment: Object {
                             return 2
                         }
                     default:
-                        break
+                        if j == 2 * dim + 4 - correcton {
+                            line[j] = { (x: [Double]) -> Double in
+                                return 1
+                            }
+                        }
                     }
                 case 2 * dim + 1:
                     switch j {
@@ -193,7 +211,12 @@ class StraightLineSegment: Object {
                             }
                         }
                     default:
-                        break
+                        let k = i - (2 * dim + 2 - correcton)
+                        if j == 2 * dim && checkConstraintP(k) {
+                            line[j] = { (x: [Double]) -> Double in
+                                return 1
+                            }
+                        }
                     }
                 }
             }
@@ -229,20 +252,20 @@ class StraightLineSegment: Object {
                 }
             }
         } else {
-            throw BluepintError.invalidDimension
+            throw BlueprintError.invalidDimension
         }
     }
 
     override func setParameters(_ parameters: [Double]) throws {
         if parameters.count != 2 * dim + 2 + activeConstraints {
-            throw BluepintError.invalidParameters
+            throw BlueprintError.invalidParameters
         }
         var sum = 0.0
         for i in 0..<dim {
             sum += pow(parameters[dim + i], 2)
         }
         if sqrt(sum) - 1.0 > 1.0e-7 {
-            throw BluepintError.invalidLengh
+            throw BlueprintError.invalidLength
         }
         for i in 0..<dim {
             vectorA[i] = parameters[i]
@@ -252,18 +275,29 @@ class StraightLineSegment: Object {
     }
 
     override func addConstraint(_ constraint: Constraint, index: Int) throws {
-        if index >= dim && index < 0 {
-            throw BluepintError.invalidDimension
+        if index > dim && index < 0 {
+            throw BlueprintError.invalidDimension
         }
-        if constraint.type == ConstraintType.constX {
+        switch constraint.type {
+        case .constX:
             constraints[index] = constraint
-        } else {
-            throw BluepintError.invalidConstrain
+        case .constP:
+            constraints[dim] = constraint
+        default:
+            throw BlueprintError.invalidConstrain
         }
     }
 
     func checkConstraint(_ index: Int) -> Bool {
-        return constraints[index].type == ConstraintType.constX
+        return constraints[index].type != .none
+    }
+
+    func checkConstraintX(_ index: Int) -> Bool {
+        return constraints[index].type == .constX
+    }
+
+    func checkConstraintP(_ index: Int) -> Bool {
+        return constraints[index].type == .constP
     }
 }
 
@@ -282,47 +316,3 @@ class StraightLineSegment2D: StraightLineSegment {
         return (vectorA + vectorB, id, .straightLineSegment2D)
     }
 }
-/*
- switch j {
- case 0..<dim:
- let k = i - (dim + 2 - correcton)
- if j == k {
- line[j] = { (x: [Double]) -> Double in
- return x[offset + self.dim]
- }
- }
- case dim:
- let k = i - (dim + 2 - correcton)
- if checkConstraint(k) {
- line[j] = { (x: [Double]) -> Double in
- return x[offset + k]
- }
- }
- default:
- break
- }
- 
- case dim..<2*dim: // second point coordinates
- if i == j {
- line[j] = { (x: [Double]) -> Double in
- return 2 + 2 * x[offset + 2 * self.dim + 1]
- }
- }
- case dim: // parameter
- if self.checkConstraint(i) {
- line[j] = { (x: [Double]) -> Double in
- return x[offset + i + self.dim + 2 - correcton]
- }
- }
- case dim + 1:
- line[j] = { (x: [Double]) -> Double in
- return 2 * x[offset + i]
- }
- default:
- let k = j - (dim + 2 - correcton)
- if i == k {
- line[j] = { (x: [Double]) -> Double in
- return x[offset + self.dim]
- }
- }
- */

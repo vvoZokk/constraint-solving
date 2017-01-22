@@ -147,13 +147,13 @@ class Point: Object {
         if coordinates.count == dim {
             vectorA = coordinates
         } else {
-            throw BluepintError.invalidDimension
+            throw BlueprintError.invalidDimension
         }
     }
 
     override func setParameters(_ parameters: [Double]) throws {
         if parameters.count != dim + activeConstraints {
-            throw BluepintError.invalidParameters
+            throw BlueprintError.invalidParameters
         }
         for i in 0..<dim {
             vectorA[i] = parameters[i]
@@ -165,10 +165,10 @@ class Point: Object {
             if constraint.type == ConstraintType.constX {
                 constraints[index] = constraint
             } else {
-                throw BluepintError.invalidConstrain
+                throw BlueprintError.invalidConstrain
             }
         } else {
-            throw BluepintError.invalidDimension
+            throw BlueprintError.invalidDimension
         }
     }
 

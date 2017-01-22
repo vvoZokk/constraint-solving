@@ -18,6 +18,7 @@ class BlueprintView: NSView {
         case addNewSLS
         case addNewConstX
         case addNewConstY
+        case addNewConstP
     }
 
     let radius = 3.0
@@ -28,6 +29,7 @@ class BlueprintView: NSView {
     @IBOutlet weak var newSLSButton: NSButton!
     @IBOutlet weak var fixXButton: NSButton!
     @IBOutlet weak var fixYButton: NSButton!
+    @IBOutlet weak var fixLengthButton: NSButton!
     weak var controller: Blueprint?
     var mode = ViewMode.none
     var lastPosition = NSPoint()
@@ -40,11 +42,11 @@ class BlueprintView: NSView {
         let backgroundColor = NSColor.init(red: 0.15, green: 0.25, blue: 0.35, alpha: 1)
         let mainColor = NSColor.init(red: 0.7, green: 0.9, blue: 0.9, alpha: 1)
         var borderColor = NSColor.init(red: 0.1, green: 0.1, blue: 0.2, alpha: 1)
-        backgroundColor.setFill()
-        borderColor.setStroke()
-        NSRectFill(dirtyRect)
-        NSRectClip(dirtyRect)
         var path = NSBezierPath()
+        backgroundColor.setFill()
+        NSRectFill(dirtyRect)
+        borderColor.setStroke()
+        NSRectClip(dirtyRect)
         path.lineWidth = 4
         path.move(to: dirtyRect.origin)
         path.line(to: NSPoint(x: dirtyRect.origin.x, y: dirtyRect.height))
@@ -67,15 +69,30 @@ class BlueprintView: NSView {
                     path.stroke()
                 }
             case .straightLineSegment2D:
-                mainColor.setStroke()
+                if selected.contains(o.key) {
+                    borderColor.setStroke()
+                } else {
+                    mainColor.setStroke()
+                }
                 path = NSBezierPath()
                 path.lineWidth = CGFloat(radius)
                 path.move(to: NSPoint(x: c[0], y: c[1]))
                 path.line(to: NSPoint(x: c[2], y: c[3]))
                 path.stroke()
-                let square = NSRect(x: c[0] - radius, y: c[1] - radius, width: 2 * radius, height: 2 * radius)
+                var square = NSRect(x: c[0] - radius / 2, y: c[1] - radius / 2, width: radius, height: radius)
                 path = NSBezierPath(ovalIn: square)
                 path.fill()
+                if selected.contains(o.key) {
+                    path.lineWidth = CGFloat(radius)
+                    path.stroke()
+                }
+                square = NSRect(x: c[2] - radius / 2, y: c[3] - radius / 2, width: radius, height: radius)
+                path = NSBezierPath(ovalIn: square)
+                path.fill()
+                if selected.contains(o.key) {
+                    path.lineWidth = CGFloat(radius)
+                    path.stroke()
+                }
             default:
                 break
             }
@@ -102,14 +119,27 @@ class BlueprintView: NSView {
                 let (type, x) = o.value
                 switch type {
                 case .point2D:
-                    let lenght = pow(x[0] - Double(pos.x), 2) + pow(x[1] - Double(pos.y), 2)
-                    if sqrt(lenght) < threshold * radius {
+                    let length = pow(x[0] - Double(pos.x), 2) + pow(x[1] - Double(pos.y), 2)
+                    if sqrt(length) < threshold * radius {
                         if selected.contains(o.key) {
                             selected.remove(o.key)
                             output.stringValue = "Status: point #\(o.key) unselected"
                         } else{
                             selected.insert(o.key)
                             output.stringValue = "Status: point #\(o.key) selected"
+                        }
+                        self.needsDisplay = true
+                    }
+                case .straightLineSegment2D:
+                    let begin = pow(x[0] - Double(pos.x), 2) + pow(x[1] - Double(pos.y), 2)
+                    let end = pow(x[2] - Double(pos.x), 2) + pow(x[3] - Double(pos.y), 2)
+                    if sqrt(begin) < threshold * radius || sqrt(end) < threshold * radius {
+                        if selected.contains(o.key) {
+                            selected.remove(o.key)
+                            output.stringValue = "Status: line #\(o.key) unselected"
+                        } else{
+                            selected.insert(o.key)
+                            output.stringValue = "Status: line #\(o.key) selected"
                         }
                         self.needsDisplay = true
                     }
@@ -139,7 +169,6 @@ class BlueprintView: NSView {
             mode = .addNewSLS
         case .addNewSLS:
             let lineSegment = StraightLineSegment2D(x0: Double(position.x), y0: Double(position.y), x1: Double(pos.x), y1: Double(pos.y))
-            //output.stringValue = " \(lineSegment.vectorA), \(lineSegment.vectorX)"
             if controller != nil {
                 mode = .none
                 controller!.add(object: lineSegment)
@@ -191,6 +220,14 @@ class BlueprintView: NSView {
                         case .point2D:
                             c[0] += Double(pos.x - lastPosition.x)
                             c[1] += Double(pos.y - lastPosition.y)
+                            if let status = controller!.setCoordinates(to: id, coordinates: c) {
+                                output.stringValue = "Status: " + status
+                            }
+                        case .straightLineSegment2D:
+                            //c[0] += Double(pos.x - lastPosition.x)
+                            //c[1] += Double(pos.y - lastPosition.y)
+                            c[2] += Double(pos.x - lastPosition.x)
+                            c[3] += Double(pos.y - lastPosition.y)
                             if let status = controller!.setCoordinates(to: id, coordinates: c) {
                                 output.stringValue = "Status: " + status
                             }
@@ -294,7 +331,59 @@ class BlueprintView: NSView {
         }
     }
 
+    @IBAction func fixLengthButtonClick(_ sender: AnyObject) {
+        switch mode {
+        case .none:
+            if objects.isEmpty {
+                output.stringValue = "Status: before draw line"
+                fixLengthButton.setNextState()
+            } else {
+                if selected.isEmpty {
+                    output.stringValue = "Status: before select lines"
+                    fixLengthButton.setNextState()
+                } else {
+                    for id in selected {
+                        if objects[id]?.type != .straightLineSegment2D {
+                            output.stringValue = "Status: select only lines, please"
+                            fixLengthButton.setNextState()
+                            return
+                        }
+                    }
+                    output.stringValue = "Status: enter length value"
+                    mode = .addNewConstP
+                    input.isEnabled = true
+                    input.becomeFirstResponder()
+                }
+            }
+        case .addNewConstP:
+            output.stringValue = "Status: aborted"
+            mode = .none
+            input.stringValue = ""
+            input.isEnabled = false
+        default:
+            fixLengthButton.setNextState()
+        }
+    }
+
     @IBAction func inputValue(_ sender: AnyObject) {
+        defer {
+            switch mode {
+            case .addNewConstX:
+                fixXButton.setNextState()
+            case .addNewConstY:
+                fixYButton.setNextState()
+            case .addNewConstP:
+                fixLengthButton.setNextState()
+            default:
+                break
+            }
+            mode = .none
+            objects = controller!.getDisplayedObjects()
+            input.stringValue = ""
+            input.isEnabled = false
+            selected.removeAll()
+            self.needsDisplay = true
+        }
         switch mode {
         case .addNewConstX, .addNewConstY:
             let value = sender.doubleValue
@@ -303,28 +392,42 @@ class BlueprintView: NSView {
                 let index: Int
                 if mode == .addNewConstX {
                     index = 0
-                    fixXButton.setNextState()
                 } else {
                     index = 1
-                    fixYButton.setNextState()
                 }
                 for id in selected {
-                    controller!.add(constraint: const, index: index, to: id)
+                    if let status = controller!.add(constraint: const, index: index, to: id) {
+                        output.stringValue = "Status: " + status
+                        return
+                    }
                 }
-                mode = .none
                 if let status = controller!.calculatePositions() {
                     output.stringValue = "Status: " + status
                 } else {
                     output.stringValue = "Status: add constraint for \(selected.count) objects"
                 }
-                objects = controller!.getDisplayedObjects()
-                input.stringValue = ""
-                input.isEnabled = false
-                selected.removeAll()
-                self.needsDisplay = true
             } else {
                 output.stringValue = "Status: controler fault"
             }
+        case .addNewConstP:
+            let value = sender.doubleValue
+            if value != nil && controller != nil {
+                let const = Constraint(type: .constP, value: value!, relation: nil)
+                for id in selected {
+                    if let status = controller!.add(constraint: const, index: 2, to: id) {
+                        output.stringValue = "Status: " + status
+                        return
+                    }
+                }
+                if let status = controller!.calculatePositions() {
+                    output.stringValue = "Status: " + status
+                } else {
+                    output.stringValue = "Status: add constraint for \(selected.count) objects"
+                }
+            } else {
+                output.stringValue = "Status: controler fault"
+            }
+
         default:
             break
         }

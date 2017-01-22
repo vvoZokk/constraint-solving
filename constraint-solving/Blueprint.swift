@@ -8,10 +8,10 @@
 
 import Foundation
 
-enum BluepintError: Error {
+enum BlueprintError: Error {
     case invalidConstrain
     case invalidDimension
-    case invalidLengh
+    case invalidLength
     case invalidObjectKey
     case invalidParameters
 }
@@ -28,13 +28,20 @@ class Blueprint {
         objects[object.id] = object
     }
 
-    func add(constraint: Constraint, index: Int, to: Int){
+    func add(constraint: Constraint, index: Int, to id: Int) -> String? {
         do {
-            try objects[to]?.addConstraint(constraint, index: index)
-        } catch BluepintError.invalidConstrain {
-
+            if objects[id] != nil {
+                try objects[id]!.addConstraint(constraint, index: index)
+                return nil
+            } else {
+                throw BlueprintError.invalidObjectKey
+            }
+        } catch BlueprintError.invalidConstrain {
+            return "constraint addition error: invalid constraint"
+        } catch BlueprintError.invalidObjectKey {
+            return "constraint addition error: invalid object's id: \(id)"
         } catch {
-
+            return "constraint addition error"
         }
     }
 
@@ -58,7 +65,7 @@ class Blueprint {
                 }
                 globalOffset += dimension
             } else {
-                throw BluepintError.invalidObjectKey
+                throw BlueprintError.invalidObjectKey
             }
         }
         return result
@@ -73,7 +80,7 @@ class Blueprint {
                 globalOffset += f!.count
                 result += f!
             } else {
-                throw BluepintError.invalidObjectKey
+                throw BlueprintError.invalidObjectKey
             }
         }
         return result
@@ -88,7 +95,7 @@ class Blueprint {
                 globalOffset += v!.count
                 result += v!
             } else {
-                throw BluepintError.invalidObjectKey
+                throw BlueprintError.invalidObjectKey
             }
         }
         return result
@@ -101,10 +108,10 @@ class Blueprint {
         var max = 0.0
 
         if result.count != hessian.count {
-            throw BluepintError.invalidDimension
+            throw BlueprintError.invalidDimension
         }
         if hessian.count != gradient.count {
-            throw BluepintError.invalidDimension
+            throw BlueprintError.invalidDimension
         }
         repeat {
             max = 0.0
@@ -194,11 +201,11 @@ class Blueprint {
                 try objects[key]?.setParameters(position)
             }
             return nil
-        } catch BluepintError.invalidDimension {
+        } catch BlueprintError.invalidDimension {
             return "position culculation error: invalid dimension"
-        } catch BluepintError.invalidLengh {
+        } catch BlueprintError.invalidLength {
             return "position culculation error: invalid length of direction vector"
-        } catch BluepintError.invalidParameters {
+        } catch BlueprintError.invalidParameters {
             return "position culculation error: invalid parameters"
         } catch {
             return "position culculation error"
@@ -220,10 +227,10 @@ class Blueprint {
             if o != nil {
                 try objects[id]!.setCoordinates(coordinates)
             } else {
-                throw BluepintError.invalidObjectKey
+                throw BlueprintError.invalidObjectKey
             }
             return nil
-        } catch BluepintError.invalidObjectKey {
+        } catch BlueprintError.invalidObjectKey {
             return "coordinates error: invalid object's id: \(id)"
         } catch {
             return "coordinates error: invalid coordinates (object #\(id))"

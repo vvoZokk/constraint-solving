@@ -695,6 +695,7 @@
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="79U-pS-Gbg" customClass="BlueprintView" customModule="constraint_solving" customModuleProvider="target">
                         <rect key="frame" x="5" y="30" width="417" height="280"/>
                         <connections>
+                            <outlet property="fixLengthButton" destination="4la-fy-YjN" id="NzQ-p2-7s3"/>
                             <outlet property="fixXButton" destination="YTr-Le-3bd" id="Nf8-iZ-ZcA"/>
                             <outlet property="fixYButton" destination="yYd-uV-DkY" id="Csp-BE-nDf"/>
                             <outlet property="input" destination="Mc6-hA-UhV" id="5ET-FQ-JsG"/>
@@ -735,10 +736,26 @@
                                         <action selector="fixYButtonClick:" target="79U-pS-Gbg" id="QzX-hs-6mG"/>
                                     </connections>
                                 </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4la-fy-YjN">
+                                    <rect key="frame" x="155" y="7" width="70" height="30"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="70" id="aHm-Jv-I56"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="square" title="Fix length" bezelStyle="shadowlessSquare" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XP8-FV-wV1">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="fixLengthButtonClick:" target="79U-pS-Gbg" id="Wb3-g6-j1r"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <constraints>
+                                <constraint firstItem="4la-fy-YjN" firstAttribute="leading" secondItem="yYd-uV-DkY" secondAttribute="trailing" constant="5" id="3u0-cJ-8vs"/>
                                 <constraint firstItem="yYd-uV-DkY" firstAttribute="leading" secondItem="YTr-Le-3bd" secondAttribute="trailing" constant="5" id="45Z-67-4wB"/>
+                                <constraint firstAttribute="bottom" secondItem="4la-fy-YjN" secondAttribute="bottom" constant="7" id="5bO-oH-hkz"/>
                                 <constraint firstAttribute="bottom" secondItem="yYd-uV-DkY" secondAttribute="bottom" constant="7" id="6lR-Xt-X1H"/>
+                                <constraint firstItem="4la-fy-YjN" firstAttribute="top" secondItem="8Il-qX-pUQ" secondAttribute="top" constant="5" id="6rL-2S-Mv8"/>
                                 <constraint firstAttribute="bottom" secondItem="YTr-Le-3bd" secondAttribute="bottom" constant="7" id="ELl-Cn-U83"/>
                                 <constraint firstItem="YTr-Le-3bd" firstAttribute="top" secondItem="8Il-qX-pUQ" secondAttribute="top" constant="5" id="LMZ-dI-ysZ"/>
                                 <constraint firstItem="yYd-uV-DkY" firstAttribute="top" secondItem="8Il-qX-pUQ" secondAttribute="top" constant="5" id="MBU-Pk-Cdy"/>
